@@ -70,7 +70,7 @@ void plusProcheVoisin(std::vector<Point2D> points, Point2D P, int dist)
     for(Point2D point : points)
     {
         // On exclut le point P de la liste des point à visiter
-        if(areEquals(P,)) continue;
+        if(areEquals(P,point)) continue;
         if(distanceEuclidienne(P, point) <= dist)
         {
             // On rajoute point dans la liste des Plus Proche Voisins (ppv)

@@ -1,7 +1,12 @@
-#include "mylib.hpp"
+﻿#include "mylib.hpp"
 
 #include <random>
 
+constexpr int MIN_NUMBER_TO_GUESS = 1;
+constexpr int MAX_NUMBER_TO_GUESS = 100;
+
+constexpr int MIN_ATTEMPTS = 5;
+constexpr int MAX_ATTEMPTS = 15;
 
 int randomInt(int min, int max)
 {
@@ -93,5 +98,75 @@ void plusProcheVoisin(std::vector<Point2D> points, Point2D P, int dist)
 
 void plusOuMoins()
 {
+    bool isRunning(true), hasWin(false);
+    int numToGuess(0), remainingAttempts(0), attempt(0);
+    std::string userInput("");
 
+    // On rentre dans la boucle générale de jeu
+    do{
+        hasWin = false;
+        attempt = 0;
+        /* Ici, j'ai choisi de créer des constantes (en haut du fichier) 
+        pour mes min et max. J'aurai pu créer des variables locales const
+        mais par flemme de devoir changer ici les valeurs, ce qui implique
+        de ma personne à devoir scroller jusqu'ici, j'ai préféré les mettre
+        en haut pas pure convenance.
+        
+        La règle générale : Si une valeur ne doit pas changer, qu'elle est employée en plusieurs endroits différents, ça peut valoir le coup de la mettre en constexpr en haut du fichier et en global "local". Sinon, si c'est utilisé qu'une seule fois, la laisser en constante locale est de rigueur.
+        */
+        numToGuess = randomInt(MIN_NUMBER_TO_GUESS, MAX_NUMBER_TO_GUESS);
+        remainingAttempts = randomInt(MIN_ATTEMPTS, MAX_ATTEMPTS);
+
+        std::cout << "Vous avez " << remainingAttempts << " tentatives pour deviner le nombre mystère !" << std::endl << std::endl;
+
+        // On rentre dans la boucle d'une partie
+        do{
+
+            // Boucle pour redemander une entrée utilisateur
+            // Tant que l'entrée n'est pas conforme
+            do{
+                std::cout << "Veuillez saisir un nombre entre " << MIN_NUMBER_TO_GUESS << " et " << MAX_NUMBER_TO_GUESS << " : ";
+                std::cin >> userInput;
+
+                // J'ai choisi de ne PAS FAIRE CONFIANCE À l'UTILISATEUR (JAMAIS)
+                // Donc je récupère l'input via std::cin sous forme de string que je convertis ensuite en int grâce à la méthode std::stoi (qui veut dire string to int, btw)
+                attempt = std::stoi(userInput);
+            }while(attempt < MIN_NUMBER_TO_GUESS || attempt > MAX_NUMBER_TO_GUESS);
+
+            if(attempt == numToGuess)
+            {
+                // Rendu à 0 à la fin de la boucle courante ligne 147
+                remainingAttempts = 1;
+                hasWin = true;
+            }else if (attempt < numToGuess) {
+                std::cout << "PLUS ! " << std::endl;
+            }
+            else {
+                std::cout << "MOINS ! " << std::endl;
+            }
+
+            std::cout << "Tentatives restantes : " << --remainingAttempts << std::endl;
+                        
+        }while(!hasWin || remainingAttempts > 0);
+
+        if(hasWin)
+        {
+            std::cout << "Félicitation ! Vous avez trouvé le nombre mystère : " << numToGuess << std::endl;
+        }
+        else
+        {
+            std::cout << "Dommage ! Vous n'avez pas trouvé le nombre mystère qui était " << numToGuess << std::endl;
+        }
+
+        userInput = "";
+        std::cout << "Souhaitez-vous retenter [y | n] ? ";
+        std::cin >> userInput;
+
+        if(std::tolower(userInput.at(0)) != 'y')
+        {
+            std::cout << "FIN DE PARTIE !" << std::endl;
+            isRunning = false;
+        }
+        
+    }while(isRunning);
 }
